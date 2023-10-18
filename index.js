@@ -39,15 +39,19 @@ async function run() {
 
 
 
-        /**Connect the client to the server**/
+        /**Connect the client to the server**/ /**ADD Product**/
         app.post('/product', async (req, res) => {
             const newproduct = req.body;
             const result = await brandCollection.insertOne(newproduct)
             res.send(result)
         })
 
-
-
+        /**Get Data From**/
+        app.get('/product', async (req, res) => {
+            const cursor = brandCollection.find();
+            const result = await cursor.toArray()
+            res.send(result)
+        })
 
 
 
