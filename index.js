@@ -52,7 +52,7 @@ async function run() {
             res.send(result)
         })
 
-        
+
 
 
         /**Get Data From ProductDB for Product Card**/
@@ -86,20 +86,66 @@ async function run() {
         })
 
 
-        
+
         app.get('/cart', async (req, res) => {
             const cursor = cartCollection.find();
             const result = await cursor.toArray()
             res.send(result)
         })
-        
+
+
+        app.delete('/cart/:id', async (req, res) => {
+            // delete req.body._id
+            const id = req.params.id;
+            console.log(id);
+            const query = { _id: new ObjectId(id) }
+            const result = await cartCollection.deleteOne(query)
+            res.send(result)
+        })
+
+
+
+
+
+        // Update Has (2 Step)
+
+
+        // First Step is Get The data
+        app.get('/product/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await brandCollection.findOne(query);
+            res.send(result)
+        })
+
+        // Second
+        app.put('/product/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const updateDoc = req.body
+            const options = { upsert: true }
+            const product = {
+                $set: {
+                    image: updateDoc.image,
+                    name: updateDoc.name,
+                    brandName: updateDoc.brandName,
+                    type: updateDoc.type,
+                    price: updateDoc.price,
+                    shortDescription: updateDoc.shortDescription,
+                    rating: updateDoc.rating
+                }
+            }
+
+            const result = await brandCollection.updateOne(filter, product, options)
+            res.send(result)
+
+        })
 
 
 
 
 
 
-        
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
